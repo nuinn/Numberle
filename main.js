@@ -1,13 +1,18 @@
+// create random password
 const password = [];
 for (let i = 0; i < 5; i++) {
   const number = (Math.floor(Math.random() * 10));
   password.push(number);
 }
-const root = document.getElementById('root');
-const title = document.createElement('p');
+
+const root = document.getElementById('root'); // access root
+// create title
+const title = document.createElement('h1');
 title.id = 'title';
 title.innerText = 'Numberwang';
 root.appendChild(title);
+
+// create game board
 const gameContainer = document.createElement('div');
 gameContainer.id = 'gameContainer';
 root.appendChild(gameContainer);
@@ -23,6 +28,7 @@ for (let i = 0; i < 6; i++) {
     rowDiv.appendChild(numberBox);
   }
 }
+// create keypad
 const keyPad = document.createElement('div');
 keyPad.id = 'keyPad';
 root.appendChild(keyPad);
@@ -33,6 +39,7 @@ keyPad.appendChild(enter);
 for (let i = 0; i < 10; i++) {
   const keyNumber = document.createElement('div');
   keyNumber.classList.add('key');
+  keyNumber.id = i;
   keyNumber.innerText = i;
   keyPad.appendChild(keyNumber);
 }
@@ -41,36 +48,46 @@ backspace.id = 'backspace';
 backspace.innerText = 'BACK';
 keyPad.appendChild(backspace);
 
-
-
 // rows = document.getElementsByClassName('row');
-// console.log(rows);
-// console.log(rowElements);
-let h = 0;
-let i = 0;
+
+let h = 0; // will count rows
+let i = 0; // will count columns
+
+// function to deal with interaction with keypad
 function getNumber(event){
-  rowElements = document.getElementsByClassName(h);
-  const gotNumber = event.target.innerText;
-  if (gotNumber === 'ENTER' && i === 5){
+  rowElements = document.getElementsByClassName(h); // saves all elements in row h in an array
+  const gotNumber = event.target.innerText; // saves number which is clicked
+  // when ENTER is clicked with 5 numbers
+  if (gotNumber === 'ENTER' && i >= 5){
     guess = getGuess(rowElements);
     checkNumber(guess,password);
-    h++;
-    i = 0;
+    h++; // moves on to next row
+    i = 0; // resets i to work from first cell again
   }
+  // if ENTER is clicked too early or more numbers are pressed after 5 filled
   else if (gotNumber.length > 5 || gotNumber === 'ENTER' && i < 5){
   }
+  // controls the BACK button
   else if (gotNumber === 'BACK'){
-    if (i > 0){
+    if (i > 0 && i <= 5){ // ensures that you can't go back beyond 0
       i--;
       rowElements[i].innerText = '';
+      rowElements[i].style.borderColor = 'lightgrey';
     }
   }
+  else if (i >= 5){
+    i = 5;
+  }
+  // if all else is OK, fills the board with number
   else{
     rowElements[i].innerText = gotNumber;
+    rowElements[i].style.borderColor = 'grey';
     i++;
   }
 }
-keyPad.onclick = getNumber;
+if (i < 5){
+  keyPad.onclick = getNumber;
+}
 function getGuess(rowElements){
   const guess = [];
   for (let i = 0; i < rowElements.length; i++) {
@@ -93,14 +110,16 @@ function checkNumber(guess,password){
   }
   for (let k = 0; k < guess.length; k++) {
     const number = parseInt(guess[k]);
-    currentCell = rowElements[k];
+    const currentCell = rowElements[k];
     if (number === password[k]){
       currentCell.style.color = 'white';
       currentCell.style.backgroundColor = '#6BAA64';
+      currentCell.style.borderColor = '#6BAA64';
     }
     else if (passwordCopy.includes(number)){
       currentCell.style.color = 'white';
       currentCell.style.backgroundColor = '#C9B458';
+      currentCell.style.borderColor = '#C9B458';
       delete passwordCopy[passwordCopy.indexOf(number)];
     }
     else{
