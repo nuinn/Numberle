@@ -55,55 +55,63 @@ let i = 0; // will count columns
 
 // function to deal with interaction with keypad
 function getNumber(event){
-  rowElements = document.getElementsByClassName(h); // saves all elements in row h in an array
+  const rowElements = document.getElementsByClassName(h); // saves all elements in row h in an array
   const gotNumber = event.target.innerText; // saves number which is clicked
-  // when ENTER is clicked with 5 numbers
-  if (gotNumber === 'ENTER' && i >= 5){
-    guess = getGuess(rowElements);
-    checkNumber(guess,password);
+  // avoids issue with parent div's inner entire inner text being called, as well as ENTER being pressed too early
+  if (gotNumber.length > 5 || gotNumber === 'ENTER' && i < 5){
+    return;
+  }
+  // when ENTER is clicked at the right time
+  if (gotNumber === 'ENTER' && i === 5){
+    const guess = getGuess(rowElements);
+    checkNumber(guess,password,rowElements);
     h++; // moves on to next row
     i = 0; // resets i to work from first cell again
   }
-  // if ENTER is clicked too early or more numbers are pressed after 5 filled
-  else if (gotNumber.length > 5 || gotNumber === 'ENTER' && i < 5){
-  }
   // controls the BACK button
   else if (gotNumber === 'BACK'){
-    if (i > 0 && i <= 5){ // ensures that you can't go back beyond 0
+    if (i > 0){ // ensures that you can't go back beyond 0
       i--;
       rowElements[i].innerText = '';
       rowElements[i].style.borderColor = 'lightgrey';
     }
   }
-  else if (i >= 5){
-    i = 5;
-  }
+  // else if (i >= 5){
+  //   console.log('here');
+  //   i = 5;
+  // }
   // if all else is OK, fills the board with number
   else{
-    rowElements[i].innerText = gotNumber;
-    rowElements[i].style.borderColor = 'grey';
-    i++;
+    if (i < 5){
+      rowElements[i].innerText = gotNumber;
+      rowElements[i].style.borderColor = 'grey';
+      i++;
+    }
   }
 }
 if (i < 5){
-  keyPad.onclick = getNumber;
+  keyPad.onclick = getNumber; // interaction with the keypad
 }
 function getGuess(rowElements){
-  const guess = [];
-  for (let i = 0; i < rowElements.length; i++) {
-    const number = rowElements[i].innerText;
-    guess.push(number);
-  }
+  const rowElementsArray = [...rowElements];
+  const guess = rowElementsArray.map((rowElement) => {
+    return rowElement.innerText;
+  });
+  // const guess = [];
+  // for (let i = 0; i < rowElements.length; i++) {
+  //   const number = rowElements[i].innerText;
+  //   guess.push(number);
+  // }
   return guess;
 }
-function checkNumber(guess,password){
-  const passwordCopy = [];
-  for (let i = 0; i < password.length; i++) {
-    passwordCopy.push(password[i]);
-  }
+function checkNumber(guess,password,rowElements){
+  const passwordCopy = [...password];
+  // for (let i = 0; i < password.length; i++) {
+  //   passwordCopy.push(password[i]);
+  // }
   for (let j = 0; j < guess.length; j++) {
     const number = parseInt(guess[j]);
-    currentCell = rowElements[j];
+    // const currentCell = rowElements[j];
     if (number === password[j]){
       delete passwordCopy[passwordCopy.indexOf(number)];
     }
